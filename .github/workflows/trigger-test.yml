@@ -6,23 +6,17 @@ jobs:
   test-github-token:
     runs-on: ubuntu-latest
     steps:
-      - name: Send repository dispatch with GITHUB_TOKEN
+      - name: Create issue with GITHUB_TOKEN
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api repos/${{ github.repository }}/dispatches \
-            --method POST \
-            --field event_type='test-event' \
-            --field 'client_payload[source]=github-token'
+          gh issue create --repo ${{ github.repository }} --title "GITHUB_TOKEN test" --body "Should NOT trigger responder"
 
   test-custom-token:
     runs-on: ubuntu-latest
     steps:
-      - name: Send repository dispatch with custom token
+      - name: Create issue with custom token
         env:
           GH_TOKEN: ${{ secrets.MY_WORKFLOW_TOKEN }}
         run: |
-          gh api repos/${{ github.repository }}/dispatches \
-            --method POST \
-            --field event_type='test-event' \
-            --field 'client_payload[source]=custom-token'
+          gh issue create --repo ${{ github.repository }} --title "Custom token test" --body "SHOULD trigger responder"
