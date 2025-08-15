@@ -6,17 +6,26 @@ jobs:
   test-github-token:
     runs-on: ubuntu-latest
     steps:
-      - name: Create issue with GITHUB_TOKEN
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: Push with GITHUB_TOKEN
         run: |
-          gh issue create --repo ${{ github.repository }} --title "GITHUB_TOKEN test" --body "Should NOT trigger responder"
+          echo "Test file $(date)" > github-token-test.txt
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Test with GITHUB_TOKEN"
+          git push
 
   test-custom-token:
     runs-on: ubuntu-latest
     steps:
-      - name: Create issue with custom token
-        env:
-          GH_TOKEN: ${{ secrets.MY_WORKFLOW_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: Push with custom token
         run: |
-          gh issue create --repo ${{ github.repository }} --title "Custom token test" --body "SHOULD trigger responder"
+          echo "Test file $(date)" > custom-token-test.txt
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Test with custom token"
+          git remote set-url origin https://x-access-token:${{ secrets.MY_WORKFLOW_TOKEN }}@github.com/${{ github.repository }}.git
+          git push
