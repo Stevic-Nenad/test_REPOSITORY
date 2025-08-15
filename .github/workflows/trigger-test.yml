@@ -2,41 +2,21 @@ name: Trigger Test
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   test-github-token:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Create PR with GITHUB_TOKEN
+      - name: Trigger workflow with GITHUB_TOKEN
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git checkout -b github-token-branch-$(date +%s)
-          echo "Test with GITHUB_TOKEN" > test-file.txt
-          git add test-file.txt
-          git commit -m "Test with GITHUB_TOKEN"
-          git push origin HEAD
-          gh pr create --title "Test PR with GITHUB_TOKEN" --body "Should NOT trigger responder workflow"
+          gh workflow run "Target Workflow" --repo ${{ github.repository }}
 
   test-custom-token:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Create PR with custom token
+      - name: Trigger workflow with custom token
         env:
           GH_TOKEN: ${{ secrets.MY_WORKFLOW_TOKEN }}
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git checkout -b custom-token-branch-$(date +%s)
-          echo "Test with custom token" > test-file.txt
-          git add test-file.txt
-          git commit -m "Test with custom token"
-          git push origin HEAD
-          gh pr create --title "Test PR with custom token" --body "SHOULD trigger responder workflow"
+          gh workflow run "Target Workflow" --repo ${{ github.repository }}
