@@ -7,25 +7,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Push with GITHUB_TOKEN
+      - name: Create PR with GITHUB_TOKEN
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Test file $(date)" > github-token-test.txt
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add .
+          git checkout -b github-token-branch-$(date +%s)
+          echo "Test with GITHUB_TOKEN" > test-file.txt
+          git add test-file.txt
           git commit -m "Test with GITHUB_TOKEN"
-          git push
+          git push origin HEAD
+          gh pr create --title "Test PR with GITHUB_TOKEN" --body "Should NOT trigger responder workflow"
 
   test-custom-token:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Push with custom token
+      - name: Create PR with custom token
+        env:
+          GH_TOKEN: ${{ secrets.MY_WORKFLOW_TOKEN }}
         run: |
-          echo "Test file $(date)" > custom-token-test.txt
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add .
+          git checkout -b custom-token-branch-$(date +%s)
+          echo "Test with custom token" > test-file.txt
+          git add test-file.txt
           git commit -m "Test with custom token"
-          git remote set-url origin https://x-access-token:${{ secrets.MY_WORKFLOW_TOKEN }}@github.com/${{ github.repository }}.git
-          git push
+          git push origin HEAD
+          gh pr create --title "Test PR with custom token" --body "SHOULD trigger responder workflow"
