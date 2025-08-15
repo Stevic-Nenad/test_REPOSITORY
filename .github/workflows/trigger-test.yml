@@ -6,17 +6,23 @@ jobs:
   test-github-token:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger workflow with GITHUB_TOKEN
+      - name: Send repository dispatch with GITHUB_TOKEN
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh workflow run "Target Workflow" --repo ${{ github.repository }}
+          gh api repos/${{ github.repository }}/dispatches \
+            --method POST \
+            --field event_type='test-event' \
+            --field 'client_payload[source]=github-token'
 
   test-custom-token:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger workflow with custom token
+      - name: Send repository dispatch with custom token
         env:
           GH_TOKEN: ${{ secrets.MY_WORKFLOW_TOKEN }}
         run: |
-          gh workflow run "Target Workflow" --repo ${{ github.repository }}
+          gh api repos/${{ github.repository }}/dispatches \
+            --method POST \
+            --field event_type='test-event' \
+            --field 'client_payload[source]=custom-token'
