@@ -1,0 +1,24 @@
+name: Trigger Test
+on:
+  workflow_dispatch:  # Manual trigger for testing
+
+jobs:
+  test-github-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue with GITHUB_TOKEN (should NOT trigger other workflows)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh issue create --title "Test with GITHUB_TOKEN - $(date)" --body "This should NOT trigger the responder workflow"
+
+  test-custom-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue with custom token (should trigger other workflows)
+        env:
+          GH_TOKEN: ${{ secrets.MY_WORKFLOW_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh issue create --title "Test with custom token - $(date)" --body "This SHOULD trigger the responder workflow"
